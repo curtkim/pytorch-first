@@ -1,0 +1,16 @@
+torchvision==0.6.0
+#numpy==1.17.5
+matplotlib==3.2.1
+omegaconf==1.4.1
+opencv_python_headless==4.2.0.34
+pandas==1.0.3
+pytorch_lightning==0.8.5
+albumentations==0.4.5
+hydra_core==0.11.3
+comet_ml==3.1.11
+tqdm==4.45.0
+torch==1.5.0
+pycocotools==2.0.2
+hydra==2.5
+Pillow==7.1.2
+scikit_learn==0.23.1

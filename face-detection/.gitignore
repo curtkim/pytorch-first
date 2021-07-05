@@ -1,0 +1,7 @@
+logs
+my_exp_name
+.pytest_cache
+.idea
+**/__pycache__/**
+**/.ipynb_checkpoints/**
+venv
