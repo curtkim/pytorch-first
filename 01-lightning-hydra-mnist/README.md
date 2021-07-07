@@ -14,7 +14,11 @@ What it does
     num_nodes: 2
 
     MASTER_ADDR=server1 MASTER_PORT=5824 WORLD_SIZE=2 NODE_RANK=0 python run.py trainer=ddp trainer.gpus='[0]'
-    MASTER_ADDR=server2 MASTER_PORT=5824 WORLD_SIZE=2 NODE_RANK=1 python run.py trainer=ddp trainer.gpus='[0]'
+    MASTER_ADDR=server1 MASTER_PORT=5824 WORLD_SIZE=2 NODE_RANK=1 python run.py trainer=ddp trainer.gpus='[0]'
+
+    2 node and each 2 gpus
+    MASTER_ADDR=server1 MASTER_PORT=port WORLD_SIZE=4 NODE_RANK=0 python run.py trainer=ddp trainer.gpus='[0,1]'
+    MASTER_ADDR=server1 MASTER_PORT=port WORLD_SIZE=4 NODE_RANK=1 python run.py trainer=ddp trainer.gpus='[0,1]'
 
 
 ## How to run
