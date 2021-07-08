@@ -14,22 +14,23 @@ def load_json(filename: str):
 
 
 def test_eval():
+    # gt_annotations = load_json("gt_annotations.json")
+    # with tempfile.TemporaryDirectory() as tmpdir:
+    #     json_file_name = os.path.join(tmpdir, "gt_full.json")
+    #     with open(json_file_name, "w") as f:
+    #         json.dump(gt_annotations, f)
+    #     with contextlib.redirect_stdout(io.StringIO()):
+    #         coco_api = COCO(json_file_name)
+    with contextlib.redirect_stdout(io.StringIO()):
+        coco_api = COCO("gt_annotations.json")
+
     detections = load_json("detections.json")
-    gt_annotations = load_json("gt_annotations.json")
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        json_file_name = os.path.join(tmpdir, "gt_full.json")
-        with open(json_file_name, "w") as f:
-            json.dump(gt_annotations, f)
-        with contextlib.redirect_stdout(io.StringIO()):
-            coco_api = COCO(json_file_name)
-
     with contextlib.redirect_stdout(io.StringIO()):
         coco_dt = coco_api.loadRes(detections)
         coco_eval = COCOeval(coco_api, coco_dt, "bbox")
         coco_eval.evaluate()
         coco_eval.accumulate()
 
-    coco_eval.summarize()
+    #coco_eval.summarize()
 
 
