@@ -13,3 +13,6 @@
 - transform을 하는 방법(직접, albumentation, torchvision)
 - model의 input, output type
 
+## Reference
+- https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Object-Detection
+
