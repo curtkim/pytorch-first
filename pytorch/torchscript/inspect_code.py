@@ -11,5 +11,8 @@ def foo(len: int) -> torch.Tensor:
             rv = rv + 1.0
     return rv
 
-
+# print code
 print(foo.code)
+
+# print ir
+print(foo.graph)
