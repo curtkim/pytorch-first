@@ -219,6 +219,13 @@ class MetricLogger(object):
 
 
 def collate_fn(batch):
+    # batch: List[Tuple[Tensor, Dict[str, Tensor]]]
+
+    #print(type(batch)) #list
+    #print(type(batch[0])) # tuple
+    #print(len(batch[0])) # 2
+    #print(type(batch[0][1])) # dict
+    #print(batch[0][1]['boxes'])
     return tuple(zip(*batch))
 
 

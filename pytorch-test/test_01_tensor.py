@@ -50,3 +50,16 @@ def test_meshgrid():
 
 def test_arange():
     assert torch.tensor([0, 1, 2]).equal(torch.arange(3))
+
+
+def test_sum_axis():
+    r = torch.ones((4, 5))
+    g = torch.ones((4, 5)) * 2
+    b = torch.ones((4, 5)) * 3
+
+    image = torch.stack((r, g, b))
+    assert torch.Size([3, 4, 5]) == image.shape
+
+    # r g b별로 합을 구한다.
+    pixel_sum = image.sum(axis=[1, 2])
+    assert torch.tensor([20, 40, 60], dtype=torch.float32).equal(pixel_sum)

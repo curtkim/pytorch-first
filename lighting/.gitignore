@@ -1,0 +1,3 @@
+MNIST
+*.ts
+lightning_logs

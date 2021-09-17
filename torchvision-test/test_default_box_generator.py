@@ -135,5 +135,5 @@ def test_default_box_generator():
     assert len(dboxes) == 2
     assert tuple(dboxes[0].shape) == (4, 4)
     assert tuple(dboxes[1].shape) == (4, 4)
-    torch.testing.assert_close(dboxes[0], dboxes_output, rtol=1e-5, atol=1e-8)
-    torch.testing.assert_close(dboxes[1], dboxes_output, rtol=1e-5, atol=1e-8)
+    torch.testing.assert_close(dboxes_output, dboxes[0], rtol=1e-5, atol=1e-8)
+    torch.testing.assert_close(dboxes_output, dboxes[1], rtol=1e-5, atol=1e-8)
