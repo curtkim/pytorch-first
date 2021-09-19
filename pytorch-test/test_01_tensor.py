@@ -1,5 +1,5 @@
 import torch
-from torch import Tensor
+from torch import tensor
 
 
 def test_scatter_add_():
@@ -63,3 +63,21 @@ def test_sum_axis():
     # r g b별로 합을 구한다.
     pixel_sum = image.sum(axis=[1, 2])
     assert torch.tensor([20, 40, 60], dtype=torch.float32).equal(pixel_sum)
+
+
+def test_transpose():
+    a = torch.ones(3, 2)
+    a_t = torch.transpose(a, 0, 1)
+    a_t2 = a.transpose(0, 1)
+    assert torch.Size([2, 3]) == a_t.shape
+    assert torch.Size([2, 3]) == a_t2.shape
+
+
+def test_zero_():
+    a = torch.ones(3, 2)
+    a.zero_()
+    tensor([
+        [0., 0.],
+        [0., 0.],
+        [0., 0.]
+    ])
