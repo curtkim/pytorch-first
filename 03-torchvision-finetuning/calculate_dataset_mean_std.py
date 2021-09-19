@@ -1,3 +1,5 @@
+# https://kozodoi.me/python/deep%20learning/pytorch/tutorial/2021/03/08/image-mean-std.html
+# https://www.thoughtco.com/sum-of-squares-formula-shortcut-3126266
 import torch
 import utils.utils as utils
 
