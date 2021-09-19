@@ -14,6 +14,19 @@ def test_scatter_add_():
     ]).type(torch.float32))
 
 
+def test_matrix_multiply():
+    a = torch.ones((2, 2))
+    b = tensor([
+        [1, 2],
+        [3, 4]
+    ], dtype=torch.float32)
+
+    assert torch.Tensor([
+        [4, 6],
+        [4, 6],
+    ]).type(torch.float32).equal(a.mm(b))
+
+
 def test_index_select():
     a = torch.arange(12).reshape(3, 4)
     indices = torch.tensor([0, 2])
@@ -81,3 +94,22 @@ def test_zero_():
         [0., 0.],
         [0., 0.]
     ])
+
+
+def test_view():
+    x = torch.range(1, 16).reshape(4, 4)
+    y = x.view(16)
+    assert torch.Size([16]) == y.shape
+
+    z = x.view(-1, 8)
+    assert torch.Size([2, 8]) == z.shape
+
+
+def test_view2():
+    x = torch.range(1, 6).reshape(2, 3)
+    y = x.view(3, 2)
+    assert tensor([
+        [1, 2],
+        [3, 4],
+        [5, 6],
+    ], dtype=torch.float32).equal(y)
