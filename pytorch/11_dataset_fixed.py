@@ -10,8 +10,11 @@ class MapDataset(Dataset):
         return 10
 
     def __getitem__(self, idx):
-        return {"input": torch.tensor([idx, 2 * idx, 3 * idx], dtype=torch.float32),
-                "label": torch.tensor(idx, dtype=torch.float32)}
+        print(idx)
+        return {
+            "input": torch.tensor([idx, 2 * idx, 3 * idx], dtype=torch.float32),
+            "label": torch.tensor(idx, dtype=torch.float32)
+        }
 
 map_dataset = MapDataset()
 
@@ -39,4 +42,4 @@ point_sampler = RandomSampler(map_dataset)
 batch_sampler = BatchSampler(point_sampler, 3, False)
 dataloader = torch.utils.data.DataLoader(map_dataset, batch_sampler=batch_sampler)
 for data in dataloader:
-    print(data['input'].shape, data['label'])
+    print(data['label'], data['input'].shape)

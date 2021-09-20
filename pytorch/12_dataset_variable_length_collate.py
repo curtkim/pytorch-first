@@ -10,8 +10,10 @@ class VarMapDataset(Dataset):
         return 10
 
     def __getitem__(self, idx):
-        return {"input": torch.tensor([idx] * (idx + 1), dtype=torch.float32),
-                "label": torch.tensor(idx, dtype=torch.float32)}
+        return {
+            "input": torch.tensor([idx] * (idx + 1), dtype=torch.float32),
+            "label": torch.tensor(idx, dtype=torch.float32)
+        }
 
 var_map_dataset = VarMapDataset()
 

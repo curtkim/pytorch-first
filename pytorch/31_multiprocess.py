@@ -55,6 +55,7 @@ if __name__ == "__main__":
     size = 2
     processes = []
     mp.set_start_method("spawn")
+
     for rank in range(size):
         p = mp.Process(target=init_process, args=(rank, size, run_reduce))
         p.start()
