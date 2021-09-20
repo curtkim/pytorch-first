@@ -5,10 +5,10 @@ import torch.distributed as dist
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import torch.multiprocessing as mp
 
 from math import ceil
 from random import Random
-from torch.multiprocessing import Process
 from torch.autograd import Variable
 from torchvision import datasets, transforms
 
@@ -136,8 +136,9 @@ def init_processes(rank, size, fn, backend='gloo'):
 if __name__ == "__main__":
     size = 2
     processes = []
+
     for rank in range(size):
-        p = Process(target=init_processes, args=(rank, size, run))
+        p = mp.Process(target=init_processes, args=(rank, size, run))
         p.start()
         processes.append(p)
 
