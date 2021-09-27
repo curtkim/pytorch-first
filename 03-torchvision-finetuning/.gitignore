@@ -1,3 +1,4 @@
 *.pth
 lightning_logs
+**/*.pyc
 
