@@ -1,0 +1,4 @@
+trained_effdet
+.ipynb_checkpoints
+.pytest_cache
+lightning_logs
