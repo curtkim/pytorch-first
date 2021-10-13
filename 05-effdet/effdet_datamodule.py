@@ -1,9 +1,12 @@
+from typing import List, Tuple, Dict
+
 import torch
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader
 
 from effdet_dataset import EfficientDetDataset
 from effdet_transformations import get_train_transforms, get_valid_transforms
+
 
 
 class EfficientDetDataModule(LightningDataModule):
@@ -62,7 +65,7 @@ class EfficientDetDataModule(LightningDataModule):
         return valid_loader
 
     @staticmethod
-    def collate_fn(batch):
+    def collate_fn(batch: List[Tuple]) -> Tuple[torch.Tensor, Dict[str, torch.Tensor], Tuple, Tuple]:
         images, targets, image_ids = tuple(zip(*batch))
         images = torch.stack(images)
         images = images.float()

@@ -61,7 +61,10 @@ def train(resume_model_path=None):
         )
 
     trainer = Trainer(
-        gpus=[0, 1], max_epochs=20, num_sanity_val_steps=1,
+        #gpus=[0, 1],
+        gpus=None,
+        max_epochs=20,
+        num_sanity_val_steps=1,
     )
 
     trainer.fit(model, dm)

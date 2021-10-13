@@ -1,4 +1,3 @@
-from effdet.config.model_config import efficientdet_model_param_dict
 from effdet import get_efficientdet_config, EfficientDet, DetBenchTrain
 from effdet.efficientdet import HeadNet
 from effdet.config.model_config import efficientdet_model_param_dict
@@ -19,8 +18,6 @@ def create_model(num_classes=1, image_size=512, architecture="tf_efficientnetv2_
     print(config)
 
     net = EfficientDet(config, pretrained_backbone=True)
-    net.class_net = HeadNet(
-        config,
-        num_outputs=config.num_classes,
-    )
+    net.class_net = HeadNet(config, num_outputs=config.num_classes)
+
     return DetBenchTrain(net, config)

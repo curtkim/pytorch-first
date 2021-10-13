@@ -6,7 +6,7 @@ from effdet_transformations import get_valid_transforms
 from effdet_create_model import create_model
 
 from fastcore.dispatch import typedispatch
-from typing import List
+from typing import List, Tuple
 import numpy as np
 
 from ensemble_boxes import ensemble_boxes_wbf
@@ -41,14 +41,14 @@ def run_wbf(predictions, image_size=512, iou_thr=0.44, skip_box_thr=0.43, weight
 
 class EfficientDetModel(LightningModule):
     def __init__(
-        self,
-        num_classes=1,
-        img_size=512,
-        prediction_confidence_threshold=0.2,
-        learning_rate=0.0002,
-        wbf_iou_threshold=0.44,
-        inference_transforms=get_valid_transforms(target_img_size=512),
-        model_architecture='tf_efficientnetv2_l',
+            self,
+            num_classes=1,
+            img_size=512,
+            prediction_confidence_threshold=0.2,
+            learning_rate=0.0002,
+            wbf_iou_threshold=0.44,
+            inference_transforms=get_valid_transforms(target_img_size=512),
+            model_architecture='tf_efficientnetv2_l',
     ):
         super().__init__()
         self.img_size = img_size
@@ -60,14 +60,12 @@ class EfficientDetModel(LightningModule):
         self.wbf_iou_threshold = wbf_iou_threshold
         self.inference_tfms = inference_transforms
 
-
     @auto_move_data
     def forward(self, images, targets):
         return self.model(images, targets)
 
     def configure_optimizers(self):
         return torch.optim.AdamW(self.model.parameters(), lr=self.lr)
-
 
     def training_step(self, batch, batch_idx):
         images, annotations, _, image_ids = batch
@@ -79,17 +77,20 @@ class EfficientDetModel(LightningModule):
         #     "box_loss": losses["box_loss"].detach(),
         # }
 
-        self.log("train_loss", losses["loss"], on_step=True, on_epoch=True, prog_bar=True,logger=True)
-        self.log("train_class_loss", losses["class_loss"], on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        self.log("train_box_loss", losses["box_loss"], on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log("train_loss", losses["loss"],              on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log("train_class_loss", losses["class_loss"],  on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log("train_box_loss", losses["box_loss"],      on_step=True, on_epoch=True, prog_bar=True, logger=True)
 
         return losses['loss']
 
-
     @torch.no_grad()
     def validation_step(self, batch, batch_idx):
+        #Tuple[torch.Tensor, Dict[str, torch.Tensor], Tuple, Tuple]
         images, annotations, targets, image_ids = batch
+        # images : B C H W
+
         outputs = self.model(images, annotations)
+        # outputs.keys() = [detections, loss, class_loss, box_loss]
 
         detections = outputs["detections"]
 
@@ -104,12 +105,11 @@ class EfficientDetModel(LightningModule):
             "box_loss": outputs["box_loss"].detach(),
         }
 
-        self.log("valid_loss", outputs["loss"],                         on_step=True, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
-        self.log("valid_class_loss", logging_losses["class_loss"],      on_step=True, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
-        self.log("valid_box_loss", logging_losses["box_loss"],          on_step=True, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
+        self.log("valid_loss", outputs["loss"],                     on_step=True, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
+        self.log("valid_class_loss", logging_losses["class_loss"],  on_step=True, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
+        self.log("valid_box_loss", logging_losses["box_loss"],      on_step=True, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
 
         return {'loss': outputs["loss"], 'batch_predictions': batch_predictions}
-
 
     @typedispatch
     def predict(self, images: List):
@@ -147,37 +147,26 @@ class EfficientDetModel(LightningModule):
         """
         if images_tensor.ndim == 3:
             images_tensor = images_tensor.unsqueeze(0)
-        if (
-                images_tensor.shape[-1] != self.img_size
-                or images_tensor.shape[-2] != self.img_size
-        ):
-            raise ValueError(
-                f"Input tensors must be of shape (N, 3, {self.img_size}, {self.img_size})"
-            )
+
+        if images_tensor.shape[-1] != self.img_size or images_tensor.shape[-2] != self.img_size:
+            raise ValueError(f"Input tensors must be of shape (N, 3, {self.img_size}, {self.img_size})")
 
         num_images = images_tensor.shape[0]
         image_sizes = [(self.img_size, self.img_size)] * num_images
 
         return self._run_inference(images_tensor, image_sizes)
 
-    def _run_inference(self, images_tensor, image_sizes):
-        dummy_targets = self._create_dummy_inference_targets(
-            num_images=images_tensor.shape[0]
-        )
+    def _run_inference(self, images_tensor: torch.Tensor, image_sizes: List[Tuple[int, int]]):
+        dummy_targets = self._create_dummy_inference_targets(num_images=images_tensor.shape[0])
 
-        detections = self.model(images_tensor.to(self.device), dummy_targets)[
-            "detections"
-        ]
-        (
-            predicted_bboxes,
-            predicted_class_confidences,
-            predicted_class_labels,
-        ) = self.post_process_detections(detections)
+        detections = self.model(images_tensor.to(self.device), dummy_targets)["detections"]
+        # torch.Tensor
+        # 0:4   boxes
+        # 4     scores
+        # 5     classes
 
-        scaled_bboxes = self.__rescale_bboxes(
-            predicted_bboxes=predicted_bboxes, image_sizes=image_sizes
-        )
-
+        predicted_bboxes, predicted_class_confidences, predicted_class_labels = self.post_process_detections(detections)
+        scaled_bboxes = self.__rescale_bboxes(predicted_bboxes=predicted_bboxes, image_sizes=image_sizes)
         return scaled_bboxes, predicted_class_labels, predicted_class_confidences
 
     def _create_dummy_inference_targets(self, num_images):
@@ -209,6 +198,14 @@ class EfficientDetModel(LightningModule):
         return predicted_bboxes, predicted_class_confidences, predicted_class_labels
 
     def _postprocess_single_prediction_detections(self, detections):
+        """
+        하나의 torch.tensor를 boxes(column0~4), scores(column4), classes(column5)로 분리한다.
+        self.prediction_confidence_threshold 보다 큰 경우만 추출
+
+        :param detections:
+        :return:
+        """
+
         boxes = detections.detach().cpu().numpy()[:, :4]
         scores = detections.detach().cpu().numpy()[:, 4]
         classes = detections.detach().cpu().numpy()[:, 5]
@@ -239,7 +236,6 @@ class EfficientDetModel(LightningModule):
 
         return scaled_bboxes
 
-
     def aggregate_prediction_outputs(self, outputs):
         detections = torch.cat(
             [output["batch_predictions"]["predictions"] for output in outputs]
@@ -269,32 +265,23 @@ class EfficientDetModel(LightningModule):
     def validation_epoch_end(self, outputs):
         """Compute and log training loss and accuracy at the epoch level."""
 
-        validation_loss_mean = torch.stack(
-            [output["loss"] for output in outputs]
-        ).mean()
-
-        (
-            predicted_class_labels,
-            image_ids,
-            predicted_bboxes,
-            predicted_class_confidences,
-            targets,
-        ) = self.aggregate_prediction_outputs(outputs)
+        (predicted_class_labels, image_ids, predicted_bboxes, predicted_class_confidences, targets,) = self.aggregate_prediction_outputs(outputs)
 
         truth_image_ids = [target["image_id"].detach().item() for target in targets]
-        truth_boxes = [
-            target["bboxes"].detach()[:, [1, 0, 3, 2]].tolist() for target in targets
-        ] # convert to xyxy for evaluation
+        # convert to xyxy for evaluation
+        truth_boxes = [target["bboxes"].detach()[:, [1, 0, 3, 2]].tolist() for target in targets]
         truth_labels = [target["labels"].detach().tolist() for target in targets]
 
-        stats = get_coco_stats(
-            prediction_image_ids=image_ids,
-            predicted_class_confidences=predicted_class_confidences,
-            predicted_bboxes=predicted_bboxes,
-            predicted_class_labels=predicted_class_labels,
-            target_image_ids=truth_image_ids,
-            target_bboxes=truth_boxes,
-            target_class_labels=truth_labels,
-        )['All']
+        return {
+            "val_loss": torch.stack([output["loss"] for output in outputs]).mean(),
+            "metrics": get_coco_stats(
+                prediction_image_ids=image_ids,
+                predicted_class_confidences=predicted_class_confidences,
+                predicted_bboxes=predicted_bboxes,
+                predicted_class_labels=predicted_class_labels,
 
-        return {"val_loss": validation_loss_mean, "metrics": stats}
+                target_image_ids=truth_image_ids,
+                target_bboxes=truth_boxes,
+                target_class_labels=truth_labels,
+            )['All']
+        }

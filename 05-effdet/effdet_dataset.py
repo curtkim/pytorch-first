@@ -31,9 +31,7 @@ class EfficientDetDataset(Dataset):
         labels = sample["labels"]
 
         _, new_h, new_w = image.shape
-        sample["bboxes"][:, [0, 1, 2, 3]] = sample["bboxes"][
-            :, [1, 0, 3, 2]
-        ]  # convert to yxyx
+        sample["bboxes"][:, [0, 1, 2, 3]] = sample["bboxes"][:, [1, 0, 3, 2]]  # convert to yxyx
 
         target = {
             "bboxes": torch.as_tensor(pascal_bboxes, dtype=torch.float32),
