@@ -55,6 +55,7 @@ def train(resume_model_path=None):
             validation_dataset_adaptor=cars_valid_ds,
             num_workers=4,
             batch_size=2)
+
     model = EfficientDetModel(
         num_classes=1,
         img_size=512
