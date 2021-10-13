@@ -10,5 +10,5 @@ model = EfficientDetModel(
 model.load_state_dict(torch.load('trained_effdet'))
 model.eval()
 
-scripted = torch.jit.script(model)
+scripted = torch.jit.script(model.model.model.fpn)
 scripted.save('scripted.torchscript')

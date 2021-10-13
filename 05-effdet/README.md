@@ -1,2 +1,51 @@
-https://medium.com/data-science-at-microsoft/training-efficientdet-on-custom-data-with-pytorch-lightning-using-an-efficientnetv2-backbone-1cdf3bd7921f
-https://amaarora.github.io/2021/01/13/efficientdet-pytorch.html
+## Reference
+- https://medium.com/data-science-at-microsoft/training-efficientdet-on-custom-data-with-pytorch-lightning-using-an-efficientnetv2-backbone-1cdf3bd7921f
+- https://amaarora.github.io/2021/01/13/efficientdet-pytorch.html
+
+## config
+
+        {
+        'name': 'tf_efficientnetv2_l', 
+        'backbone_name': 'tf_efficientnetv2_l', 
+        'backbone_args': {'drop_path_rate': 0.2}, 
+        'backbone_indices': None, 
+        'image_size': [512, 512], 
+        'num_classes': 1, 
+        'min_level': 3, 
+        'max_level': 7, 
+        'num_levels': 5, 
+        'num_scales': 3, 
+        'aspect_ratios': [[1.0, 1.0], [1.4, 0.7], [0.7, 1.4]], 
+        'anchor_scale': 4.0, 
+        'pad_type': 'same', 
+        'act_type': 'swish', 
+        'norm_layer': None, 
+        'norm_kwargs': {'eps': 0.001, 'momentum': 0.01}, 
+        'box_class_repeats': 3, 
+        'fpn_cell_repeats': 3, 
+        'fpn_channels': 88, 
+        'separable_conv': True, 
+        'apply_resample_bn': True, 
+        'conv_after_downsample': False, 
+        'conv_bn_relu_pattern': False, 
+        'use_native_resize_op': False, 
+        'downsample_type': 'max', 
+        'upsample_type': 'nearest', 
+        'redundant_bias': True, 
+        'head_bn_level_first': False, 
+        'head_act_type': None, 
+        'fpn_name': None, 
+        'fpn_config': None, 
+        'fpn_drop_path_rate': 0.0, 
+        'alpha': 0.25, 
+        'gamma': 1.5, 
+        'label_smoothing': 0.0, 
+        'legacy_focal': False, 
+        'jit_loss': False, 
+        'delta': 0.1, 
+        'box_loss_weight': 50.0, 
+        'soft_nms': False, 
+        'max_detection_points': 5000, 
+        'max_det_per_image': 100, 
+        'url': ''
+        }
