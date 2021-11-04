@@ -1,6 +1,32 @@
+## 개요
+effdet를 torchlighting으로 training
+torchscript로 변환
+
 ## Reference
 - https://medium.com/data-science-at-microsoft/training-efficientdet-on-custom-data-with-pytorch-lightning-using-an-efficientnetv2-backbone-1cdf3bd7921f
 - https://amaarora.github.io/2021/01/13/efficientdet-pytorch.html
+
+## step
+
+    python train.py 
+    # -> trained_effdet 생성
+    python _to_torchscript.py
+    # -> scripted.torchscript
+
+    trained_effdet : 450M
+    scripted.torchscript: 449M
+
+
+## torchscript
+#### torch.jit.ignore: 
+- function or method should be ignored and left as a Python function
+- This allows you to leave code in your model that is not yet TorchScript compatible
+- If called from TorchScript, ignored functions will dispatch the call to the Python interpreter
+- Models with ignored functions cannot be exported. use @torch.jit.unused instead
+#### torch.jit.unused
+- This decorator indicates to the compiler that a function or method should be ignored and replaced with the raising of an exception
+- This allows you to leave code in your model that is not yet TorchScript compatible and still export your model
+
 
 ## config
 

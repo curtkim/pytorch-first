@@ -1,5 +1,8 @@
 # error 발생
 import torch
+from effdet import DetBenchTrain, EfficientDet
+
+from effdet_create_model import create_model
 from effdet_model_1 import EfficientDetModel
 
 model = EfficientDetModel(
@@ -9,6 +12,11 @@ model = EfficientDetModel(
 
 model.load_state_dict(torch.load('trained_effdet'))
 model.eval()
+print(type(model))
+print(type(model.model))
+print(type(model.model.model))
+target_model = model.model.model
 
-scripted = torch.jit.script(model.model.model.fpn)
+scripted = torch.jit.script(target_model)
 scripted.save('scripted.torchscript')
+

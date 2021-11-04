@@ -1,14 +1,14 @@
-from effdet import get_efficientdet_config, EfficientDet, DetBenchTrain
-#from effdet.efficientdet import HeadNet
-from effdet.config.model_config import efficientdet_model_param_dict
-
-
 import torch
 from torch import nn
 from collections import OrderedDict
 from typing import List, Callable, Optional, Union, Tuple
 from functools import partial
 from timm.models.layers import create_conv2d, create_pool2d, Swish, get_act_layer
+
+from effdet import get_efficientdet_config, EfficientDet, DetBenchTrain
+#from effdet.efficientdet import HeadNet
+from effdet.config.model_config import efficientdet_model_param_dict
+
 
 _ACT_LAYER = Swish
 
@@ -161,24 +161,24 @@ class HeadNet(nn.Module):
         #     return self._forward(x)
 
 
+num_classes = 1
+image_size = 512
+architecture = "tf_efficientnetv2_l"
 
-def create_model(num_classes=1, image_size=512, architecture="tf_efficientnetv2_l"):
-    efficientdet_model_param_dict['tf_efficientnetv2_l'] = dict(
-        name='tf_efficientnetv2_l',
-        backbone_name='tf_efficientnetv2_l',
-        backbone_args=dict(drop_path_rate=0.2),
-        num_classes=num_classes,
-        url='', )
+efficientdet_model_param_dict['tf_efficientnetv2_l'] = dict(
+    name='tf_efficientnetv2_l',
+    backbone_name='tf_efficientnetv2_l',
+    backbone_args=dict(drop_path_rate=0.2),
+    num_classes=num_classes,
+    url='', )
 
-    config = get_efficientdet_config(architecture)
-    config.update({'num_classes': num_classes})
-    config.update({'image_size': (image_size, image_size)})
-    # torchscript때문에 추가됨.
-    config.update({'head_bn_level_first': True})
-    print(config)
+config = get_efficientdet_config(architecture)
+config.update({'num_classes': num_classes})
+config.update({'image_size': (image_size, image_size)})
+config.update({'head_bn_level_first': True})
+print(config)
 
-    net = EfficientDet(config, pretrained_backbone=True)
-    net.class_net = HeadNet(config, num_outputs=config.num_classes)
-    net.box_net = HeadNet(config, num_outputs=4)
-
-    return DetBenchTrain(net, config)
+class_net = HeadNet(config, num_outputs=config.num_classes)
+print(class_net.bn_level_first)
+scripted = torch.jit.script(class_net)
+scripted.save('temp')
