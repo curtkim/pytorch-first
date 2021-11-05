@@ -1,6 +1,10 @@
 ## 개요
-effdet를 torchlighting으로 training
-torchscript로 변환
+- effdet를 torchlighting으로 training
+- _to_torchscript로 변환 (성공)
+  torch.jit.script으로 변환 effdet.HeadNet forward가 변환되지 않아서 코드를 수정함.
+- torch.jit.trace로 시도 (코드 수정없이)
+  어려울듯. warning이 나오기는 했는데, 파일은 생성됨.
+
 
 ## Reference
 - https://medium.com/data-science-at-microsoft/training-efficientdet-on-custom-data-with-pytorch-lightning-using-an-efficientnetv2-backbone-1cdf3bd7921f

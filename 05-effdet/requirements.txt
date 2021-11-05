@@ -1,0 +1,5 @@
+pytorch_lightning=1.4.9
+effdet
+fastcore
+ensemble_boxes
+git+https://github.com/alexhock/object-detection-metrics

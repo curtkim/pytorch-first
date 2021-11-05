@@ -54,7 +54,7 @@ def train(resume_model_path=None):
     dm = EfficientDetDataModule(train_dataset_adaptor=cars_train_ds,
             validation_dataset_adaptor=cars_valid_ds,
             num_workers=4,
-            batch_size=2)
+            batch_size=8)
 
     model = EfficientDetModel(
         num_classes=1,
@@ -62,9 +62,9 @@ def train(resume_model_path=None):
         )
 
     trainer = Trainer(
-        gpus=[0, 1],
+        gpus=[0],
         #gpus=None,
-        max_epochs=20,
+        max_epochs=30,
         num_sanity_val_steps=1,
     )
 
