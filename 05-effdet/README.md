@@ -4,7 +4,17 @@
   torch.jit.script으로 변환 effdet.HeadNet forward가 변환되지 않아서 코드를 수정함.
 - torch.jit.trace로 시도 (코드 수정없이)
   어려울듯. warning이 나오기는 했는데, 파일은 생성됨.
+- predictor.py torchscript화된 effdet.EfficentNet만을 로드해서
+  DetBenchTrain의 일부기능과 EfficientDetModel 일부기능을 빼냄 
 
+
+## Note
+- DetBenchTrain의 결과는
+  loss, class_loss, box_loss를 반환하고
+  training이 아닐때는 detections를 추가로 반환한다.
+  _post_process: top-k를 찾고
+  _batch_detection: nms 하는 것 같은데
+  
 
 ## Reference
 - https://medium.com/data-science-at-microsoft/training-efficientdet-on-custom-data-with-pytorch-lightning-using-an-efficientnetv2-backbone-1cdf3bd7921f
@@ -22,6 +32,8 @@
 
 
 ## torchscript
+#### torch.jit.script:
+
 #### torch.jit.ignore: 
 - function or method should be ignored and left as a Python function
 - This allows you to leave code in your model that is not yet TorchScript compatible
@@ -76,6 +88,7 @@
         'box_loss_weight': 50.0, 
         'soft_nms': False, 
         'max_detection_points': 5000, 
-        'max_det_per_image': 100, 
+        
+        'max_det_per_image': 100,         # 최대 몇개의 bouding box 
         'url': ''
         }
