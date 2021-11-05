@@ -1,5 +1,5 @@
 ## 개요
-- effdet를 torchlighting으로 training
+- effdet를 torchlighting으로 training(weight_size가 450M ㅠㅠ)
 - _to_torchscript로 변환 (성공)
   torch.jit.script으로 변환 effdet.HeadNet forward가 변환되지 않아서 코드를 수정함.
 - torch.jit.trace로 시도 (코드 수정없이)
