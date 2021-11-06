@@ -38,5 +38,7 @@ print(img.shape)
 
 ssdlite = torchvision.models.detection.ssdlite320_mobilenet_v3_large(pretrained=True)
 print("ssdlite count", param_count(ssdlite))
+print("ssdlite.backbone count", param_count(ssdlite.backbone))
+print("ssdlite.head count", param_count(ssdlite.head))
 scripted_ssdlite = torch.jit.script(ssdlite)
 scripted_ssdlite.save('ssdlite.torchscript')
