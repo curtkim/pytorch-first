@@ -65,4 +65,4 @@ def object_detection_api(img_path, threshold=0.5, rect_th=3, text_size=3, text_t
 
 if __name__ == '__main__':
     print(torch.__version__)
-    object_detection_api("input/traffic.jpg")
+    object_detection_api("../pytorch/input/traffic.jpg")
