@@ -1,3 +1,5 @@
+# optimizer.step() 전에 average_gradients를 호출하는게 핵심인것 같다.
+# model.parameters()들을 평균낸다.
 
 import os
 import torch
@@ -78,11 +80,12 @@ def partition_dataset():
         download=True,
         transform=transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize((0.1307, ), (0.3081, ))
+            transforms.Normalize((0.1307,), (0.3081,))
         ]))
     size = dist.get_world_size()
     bsz = int(128 / size)
     partition_sizes = [1.0 / size for _ in range(size)]
+
     partition = DataPartitioner(dataset, partition_sizes)
     partition = partition.use(dist.get_rank())
     train_set = torch.utils.data.DataLoader(
@@ -94,17 +97,18 @@ def average_gradients(model):
     """ Gradient averaging. """
     size = float(dist.get_world_size())
     for param in model.parameters():
+        ### dist.all_reduct ###
         dist.all_reduce(param.grad.data, op=dist.reduce_op.SUM)
         param.grad.data /= size
 
 
-def run(rank, size):
+def run(rank: int, size: int):
     """ Distributed Synchronous SGD Example """
     torch.manual_seed(1234)
     train_set, bsz = partition_dataset()
     model = Net()
     model = model
-#    model = model.cuda(rank)
+    #    model = model.cuda(rank)
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
 
     num_batches = ceil(len(train_set.dataset) / float(bsz))
@@ -112,7 +116,7 @@ def run(rank, size):
         epoch_loss = 0.0
         for data, target in train_set:
             data, target = Variable(data), Variable(target)
-#            data, target = Variable(data.cuda(rank)), Variable(target.cuda(rank))
+            #            data, target = Variable(data.cuda(rank)), Variable(target.cuda(rank))
             optimizer.zero_grad()
             output = model(data)
             loss = F.nll_loss(output, target)
@@ -125,20 +129,20 @@ def run(rank, size):
               epoch_loss / num_batches)
 
 
-def init_processes(rank, size, fn, backend='gloo'):
+def init_processes(rank, world_size, fn, backend='gloo'):
     """ Initialize the distributed environment. """
     os.environ['MASTER_ADDR'] = '127.0.0.1'
     os.environ['MASTER_PORT'] = '29500'
-    dist.init_process_group(backend, rank=rank, world_size=size)
-    fn(rank, size)
+    dist.init_process_group(backend, rank=rank, world_size=world_size)
+    fn(rank, world_size)
 
 
 if __name__ == "__main__":
-    size = 2
+    world_size = 2
     processes = []
 
-    for rank in range(size):
-        p = mp.Process(target=init_processes, args=(rank, size, run))
+    for rank in range(world_size):
+        p = mp.Process(target=init_processes, args=(rank, world_size, run))
         p.start()
         processes.append(p)
 

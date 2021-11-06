@@ -42,6 +42,12 @@ def run_reduce(rank, size):
     dist.all_reduce(tensor, op=dist.ReduceOp.SUM, group=group)
     print('Rank ', rank, ' has data ', tensor[0])
 
+    # Rank  0  has data Rank   1  has data  tensor(2.)
+    # tensor(2.)
+    # maybe
+    # Rank 0 has data tensor(2.)
+    # Rank 1 ahs data tensor(2.)
+
 
 def init_process(rank, size, fn, backend='gloo'):
     """ Initialize the distributed environment. """
