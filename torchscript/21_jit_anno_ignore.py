@@ -17,8 +17,8 @@ class MyModule(nn.Module):
 def test_scripted_module():
     m = torch.jit.script(MyModule())
 
-    # This is OK since `training_method` is not saved, the call is replaced
-    # with a `raise`.
+    # 성공한다. training_method는 저정되지 않기 때문에
+    # 그라나 콜이 된다면 에러를 발생시킨다.
     m.save("m.pt")
 
     sample = torch.arange(5)

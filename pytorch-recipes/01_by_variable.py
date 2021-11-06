@@ -1,3 +1,5 @@
+# Tensor you can also do on a Variable;
+# the difference is that autograd allows you to automatically compute gradients.
 import torch
 from torch.autograd import Variable
 

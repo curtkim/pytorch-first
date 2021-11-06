@@ -181,5 +181,5 @@ if __name__ == "__main__":
     # warmup
     timeit.timeit(lambda: test1(), number=1)
 
-    print(timeit.timeit(lambda: test2(), number=10))
-    print(timeit.timeit(lambda: test1(), number=10))
+    print("plain_python", timeit.timeit(lambda: test2(), number=10))
+    print("script_method", timeit.timeit(lambda: test1(), number=10))
