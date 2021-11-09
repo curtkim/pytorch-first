@@ -1,5 +1,5 @@
 import torch
-from torchvision.ops import box_convert, box_area, box_iou, remove_small_boxes, nms
+from torchvision.ops import box_convert, box_area, box_iou, remove_small_boxes, nms, batched_nms
 
 
 def test_box_convert():
@@ -61,3 +61,16 @@ def test_nms():
 
     # 두번째 box만 남긴다.
     assert torch.allclose(keep, torch.tensor([1]))
+
+
+def test_batched_nms():
+    boxes = torch.tensor([[285.3538, 185.5758, 1193.5110, 851.4551],
+                          [285.1472, 188.7374, 1192.4984, 851.0669],
+                          [279.2440, 197.9812, 1189.4746, 849.2019]])
+    scores = torch.tensor([0.6370, 0.7569, 0.3966])
+    idxs = torch.tensor([1, 1, 2])
+    iou_thres = 0.2
+    keep = batched_nms(boxes, scores, idxs, iou_thres)
+
+    # 두번째, 세번째 box를 남긴다.(class가 달라서)
+    assert keep.equal(torch.tensor([1, 2], dtype=torch.int64))
