@@ -1,2 +1,5 @@
 *.onnx
 *.pt
+cmake-build-debug
+build
+*.torchscript

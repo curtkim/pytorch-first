@@ -1,0 +1,8 @@
+[requires]
+torch/1.7.1@curt/prebuilt
+
+[generators]
+cmake
+
+[options]
+torch:cuda=11.0
