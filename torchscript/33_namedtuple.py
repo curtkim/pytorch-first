@@ -13,3 +13,4 @@ def total(point: Point) -> torch.Tensor:
 p = Point(x=torch.rand(3), y=torch.rand(3))
 print(total(p))
 print(total.code)
+total.save('33_namedtuple.torchscript')

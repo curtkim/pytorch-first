@@ -8,7 +8,7 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 
-foreach(APP 34_tuple)
+foreach(APP 33_namedtuple 34_tuple)
 	add_executable(${APP} ${APP}.cpp)
 	target_include_directories(${APP} PUBLIC /usr/local/cuda/include)
 	target_link_directories(${APP} PUBLIC /usr/local/cuda/lib64)
