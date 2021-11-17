@@ -113,3 +113,25 @@ def test_view2():
         [3, 4],
         [5, 6],
     ], dtype=torch.float32).equal(y)
+
+
+def test_index_fill():
+    x = torch.tensor([
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+    ], dtype=torch.int)
+
+    index = torch.tensor([0, 2], dtype=torch.long)
+
+    assert torch.tensor([
+        [-1, -1, -1],
+        [4, 5, 6],
+        [-1, -1, -1]
+    ], dtype=torch.int).equal(x.index_fill(0, index, -1))
+
+    assert torch.tensor([
+        [-1, 2, -1],
+        [-1, 5, -1],
+        [-1, 8, -1],
+    ], dtype=torch.int).equal(x.index_fill(1, index, -1))
