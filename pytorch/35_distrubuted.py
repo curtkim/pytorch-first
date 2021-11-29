@@ -2,6 +2,8 @@
 # model.parameters()들을 평균낸다.
 
 import os
+import typing
+
 import torch
 import torch.distributed as dist
 import torch.nn as nn
@@ -18,7 +20,7 @@ from torchvision import datasets, transforms
 class Partition(object):
     """ Dataset-like object, but only access a subset of it. """
 
-    def __init__(self, data, index):
+    def __init__(self, data, index: typing.List):
         self.data = data
         self.index = index
 
@@ -40,12 +42,17 @@ class DataPartitioner(object):
         rng.seed(seed)
         data_len = len(data)
         indexes = [x for x in range(0, data_len)]
-        rng.shuffle(indexes)
+        #rng.shuffle(indexes)
 
         for frac in sizes:
             part_len = int(frac * data_len)
             self.partitions.append(indexes[0:part_len])
             indexes = indexes[part_len:]
+        print('self.partitions', type(self.partitions), len(self.partitions))
+        print('self.data', type(self.data), len(self.data))
+        for partition in self.partitions:
+            print('min', min(partition), 'max', max(partition))
+
 
     def use(self, partition):
         return Partition(self.data, self.partitions[partition])
@@ -98,11 +105,11 @@ def average_gradients(model):
     size = float(dist.get_world_size())
     for param in model.parameters():
         ### dist.all_reduct ###
-        dist.all_reduce(param.grad.data, op=dist.reduce_op.SUM)
+        dist.all_reduce(param.grad.data, op=dist.ReduceOp.SUM)
         param.grad.data /= size
 
 
-def run(rank: int, size: int):
+def run(): #rank: int, size: int
     """ Distributed Synchronous SGD Example """
     torch.manual_seed(1234)
     train_set, bsz = partition_dataset()
@@ -116,7 +123,7 @@ def run(rank: int, size: int):
         epoch_loss = 0.0
         for data, target in train_set:
             data, target = Variable(data), Variable(target)
-            #            data, target = Variable(data.cuda(rank)), Variable(target.cuda(rank))
+            #data, target = Variable(data.cuda(rank)), Variable(target.cuda(rank))
             optimizer.zero_grad()
             output = model(data)
             loss = F.nll_loss(output, target)
@@ -124,9 +131,8 @@ def run(rank: int, size: int):
             loss.backward()
             average_gradients(model)
             optimizer.step()
-        print('Rank ',
-              dist.get_rank(), ', epoch ', epoch, ': ',
-              epoch_loss / num_batches)
+        print('Rank ', dist.get_rank(),
+              ', epoch ', epoch, ': ', epoch_loss / num_batches)
 
 
 def init_processes(rank, world_size, fn, backend='gloo'):
@@ -134,7 +140,7 @@ def init_processes(rank, world_size, fn, backend='gloo'):
     os.environ['MASTER_ADDR'] = '127.0.0.1'
     os.environ['MASTER_PORT'] = '29500'
     dist.init_process_group(backend, rank=rank, world_size=world_size)
-    fn(rank, world_size)
+    fn() #rank, world_size
 
 
 if __name__ == "__main__":
