@@ -5,7 +5,7 @@ import webdataset as wds
 from itertools import islice
 
 
-dataset = wds.Dataset('voc.tar')
+dataset = wds.WebDataset('voc.tar')
 
 # islice(iterable, start, stop[, step])
 sample: Dict
@@ -21,10 +21,18 @@ for sample in dataset:
 
 '''
 __key__ './2007_000027'
+__url__ 'voc.tar'
+__worker__ 'None'
+__rank__ 'None'
+__nodeinfo__ "('curtw', 88055)"
 jpg b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00
 xml b'<annotation>\n\t<folder>VOC2012</folder>\n\t<fil
 
 __key__ './2007_000032'
+__url__ 'voc.tar'
+__worker__ 'None'
+__rank__ 'None'
+__nodeinfo__ "('curtw', 88055)"
 jpg b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00
 xml b'<annotation>\n\t<folder>VOC2012</folder>\n\t<fil
 '''

@@ -5,7 +5,7 @@ import webdataset as wds
 from itertools import islice
 
 
-dataset = wds.Dataset('openimages-train-000000.tar')
+dataset = wds.WebDataset('openimages-train-000000.tar')
 
 # islice(iterable, start, stop[, step])
 sample: Dict

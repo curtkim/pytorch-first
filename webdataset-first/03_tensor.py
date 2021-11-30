@@ -21,7 +21,7 @@ preproc = transforms.Compose([
 ])
 
 dataset = (
-    wds.Dataset(url)
+    wds.WebDataset(url)
     .shuffle(100)
     .decode("pil")
     .to_tuple("jpg;png", "json")

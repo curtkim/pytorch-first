@@ -10,7 +10,7 @@ def my_split_by_node(urls):
 
 
 urls = list(braceexpand.braceexpand("dataset-{000000..000009}.tar"))
-dataset = wds.ShardList(urls, splitter=wds.split_by_worker, nodesplitter=my_split_by_node, shuffle=False)
+dataset = wds.SimpleShardList(urls, splitter=wds.split_by_worker, nodesplitter=my_split_by_node, shuffle=False)
 
 for item in dataset:
     print(item)

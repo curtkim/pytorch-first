@@ -1,6 +1,7 @@
 import webdataset as wds
 
 my_iter = wds.shuffle(iter([1, 2, 3, 4, 5]))
+print(type(my_iter))
 
 for item in my_iter:
     print(item)

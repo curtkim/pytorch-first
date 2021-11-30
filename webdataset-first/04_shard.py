@@ -24,10 +24,10 @@ preproc = transforms.Compose([
 
 url = "http://storage.googleapis.com/nvdata-openimages/openimages-train-{000000..000004}.tar"
 url = f"pipe:curl -L -s {url} || true"
-bs = 20
+batch_size = 20
 
 dataset = (
-    wds.Dataset(url, length=int(1e9) // bs)
+    wds.WebDataset(url, length=int(1e9) // batch_size)
     .shuffle(100)
     .decode("pil")
     .to_tuple("jpg;png", "json")
