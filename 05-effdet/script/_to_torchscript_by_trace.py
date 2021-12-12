@@ -1,9 +1,7 @@
 # error 발생
 import torch
-from effdet import DetBenchTrain, EfficientDet
 
-from effdet_create_model import create_model
-from effdet_model_1 import EfficientDetModel
+from src.effdet_model_1 import EfficientDetModel
 
 
 model = EfficientDetModel(
@@ -11,7 +9,7 @@ model = EfficientDetModel(
     img_size=512
     )
 
-model.load_state_dict(torch.load('trained_effdet'))
+model.load_state_dict(torch.load('../trained_effdet'))
 model.eval()
 print(type(model))
 print(type(model.model))
@@ -19,7 +17,7 @@ print(type(model.model.model))
 target_model = model.model.model
 
 traced = torch.jit.trace(target_model, torch.rand(2, 3, 512, 512))
-traced.save('traced.torchscript')
+traced.save('../traced.torchscript')
 
 """
 아래 코드에서 warnning이 발생

@@ -1,8 +1,9 @@
 ## intro
-- 01-lighting-hydra-mnist 
-- 02-torchvision-finetuning            maskrcnn_resnet50_fpn     torchvision.transforms		PIL
-- 04-wheat                             fasterrcnn_resnet50_fpn   albumentations			cv2
-- 05-face-detection                    FasterRCNN		 albumentations + custom	skimage
+- 01-lighting-hydra-mnist              cnn
+- 02-wheat (lighting, hydra)           fasterrcnn_resnet50_fpn   albumentations			cv2
+- 03-torchvision-finetuning            maskrcnn_resnet50_fpn     torchvision.transforms		PIL
+- 04-face-detection (lighting)         FasterRCNN		 albumentations + custom	skimage
+- 05-effdet (lighting)                 effdet                    albumentations                 PIL
 
 ## options
 - lighting

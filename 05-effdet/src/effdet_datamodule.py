@@ -4,9 +4,8 @@ import torch
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader
 
-from effdet_dataset import EfficientDetDataset
-from effdet_transformations import get_train_transforms, get_valid_transforms
-
+from src.effdet_dataset import EfficientDetDataset
+from src.effdet_transformations import get_train_transforms, get_valid_transforms
 
 
 class EfficientDetDataModule(LightningDataModule):

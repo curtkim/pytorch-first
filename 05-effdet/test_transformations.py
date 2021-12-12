@@ -1,7 +1,6 @@
 from pathlib import Path
 import pandas as pd
-from dataset_adaptor import CarsDatasetAdaptor
-from effdet_transformations import get_valid_transforms
+from src.dataset_adaptor import CarsDatasetAdaptor
 import albumentations as A
 from albumentations.pytorch.transforms import ToTensorV2
 

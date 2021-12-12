@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 
 import torch
-from dataset_adaptor import CarsDatasetAdaptor
+from src.dataset_adaptor import CarsDatasetAdaptor
 from predictor import predict
 from effdet.config.model_config import efficientdet_model_param_dict
 from effdet import get_efficientdet_config
