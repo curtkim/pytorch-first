@@ -1,3 +1,6 @@
+## template
+https://github.com/ashleve/lightning-hydra-template
+
 ## console out
 
     venv/lib/python3.8/site-packages/hydra/_internal/defaults_list.py:251: UserWarning: In 'config.yaml': Defaults list is missing `_self_`. See https://hydra.cc/docs/upgrades/1.0_to_1.1/default_composition_order for more information

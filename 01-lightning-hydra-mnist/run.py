@@ -1,6 +1,7 @@
 import dotenv
 import hydra
 from omegaconf import DictConfig
+from logging_tree import printout
 
 # load environment variables from `.env` file if it exists
 # recursively searches for `.env` in all folders starting from work dir
@@ -26,6 +27,8 @@ def main(config: DictConfig):
     # Pretty print config using Rich library
     if config.get("print_config"):
         utils.print_config(config, resolve=True)
+
+    printout()
 
     # Train model
     return train(config)
