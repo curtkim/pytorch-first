@@ -122,13 +122,12 @@ def run(): #rank: int, size: int
     )
 
     torch.manual_seed(1234)
-    train_set, bsz = partition_dataset(dist.get_rank(), dist.get_world_size())
+    train_set, batch_size = partition_dataset(dist.get_rank(), dist.get_world_size())
     model = Net()
-    model = model
     #    model = model.cuda(rank)
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
 
-    num_batches = ceil(len(train_set.dataset) / float(bsz))
+    num_batches = ceil(len(train_set.dataset) / float(batch_size))
     for epoch in range(10):
         epoch_loss = 0.0
         for data, target in train_set:
@@ -155,8 +154,6 @@ def init_processes(rank, world_size, fn, backend='gloo'):
 
 
 if __name__ == "__main__":
-
-    print(os.getpid())
 
     world_size = 2
     processes = []

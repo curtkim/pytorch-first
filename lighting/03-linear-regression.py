@@ -1,6 +1,9 @@
+import sys
 import logging
 import warnings
 from pytorch_lightning import LightningDataModule, LightningModule, Trainer
+import pytorch_lightning
+from pytorch_lightning.callbacks import ProgressBarBase
 from torch.utils.data import DataLoader, Dataset
 from typing import Optional, List, Any
 import numpy as np
@@ -80,10 +83,31 @@ class MyModule(LightningModule):
         return {'loss': loss}
 
     def training_epoch_end(self, outputs: List[Any]):
-        print(self.current_epoch, outputs)
+        # print(self.current_epoch, outputs)
+        pass
 
     def configure_optimizers(self):
         return torch.optim.SGD(self.model.parameters(), lr=self.learningRate)
+
+
+class ConsoleProgressBar(ProgressBarBase):
+    def __init__(self):
+        super().__init__()  # don't forget this :)
+        self.enable = True
+
+    def disable(self):
+        self.enable = False
+
+    def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
+        super().on_train_batch_end(trainer, pl_module, outputs, batch, batch_idx)  # don't forget this :)
+        percent = (self.train_batch_idx / self.total_train_batches) * 100
+        #sys.stdout.flush()
+        #sys.stdout.write(f'{percent:.01f} percent complete \r')
+        #print(trainer.current_epoch, batch_idx, outputs)
+        #print(f'{percent:.01f} percent complete {batch_idx}')
+
+    def on_epoch_end(self, trainer, pl_module):
+        pass
 
 
 if __name__ == '__main__':
@@ -96,7 +120,7 @@ if __name__ == '__main__':
 
     logging.basicConfig(
         level=logging.INFO,
-        format="%(asctime)s %(module)s %(funcName)s [%(levelname)s] %(message)s",
+        format="%(asctime)s %(module)s %(name)s %(funcName)s [%(levelname)s] %(message)s",
         handlers=[
             logging.FileHandler("debug.log", mode='w'),
             logging.StreamHandler()
@@ -105,16 +129,22 @@ if __name__ == '__main__':
     #logging_tree.printout()
 
     logging.info('start')
-    module = MyModule(0.01)
-    datamodule = MyDataModule(10, batch_size=5, num_workers=0, pin_memory=False)
+    module = MyModule(0.0001)
+    datamodule = MyDataModule(20, batch_size=10, num_workers=0, pin_memory=False)
 
+    # callbacks = [
+    #     pytorch_lightning.callbacks.model_summary.ModelSummary(),
+    #     pytorch_lightning.callbacks.model_checkpoint.ModelCheckpoint(),
+    #     #pytorch_lightning.callbacks.progress.RichProgressBar(refresh_rate_per_second=0.01),
+    #     ConsoleProgressBar(),
+    # ]
     trainer = Trainer(
         max_epochs=100,
-        # enable_progress_bar=False,
-        # enable_progress_bar=True,
+        #enable_progress_bar=True,
         # log_every_n_steps=10,
         # flush_logs_every_n_steps=10,
         #progress_bar_refresh_rate=0,
+        #callbacks=callbacks,
     )
     # print(trainer.callbacks)
     # [
