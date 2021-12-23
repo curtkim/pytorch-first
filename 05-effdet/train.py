@@ -2,13 +2,12 @@ import torch
 from pytorch_lightning import Trainer
 
 
-from dataset_adaptor import CarsDatasetAdaptor
-from effdet_datamodule import EfficientDetDataModule
-from effdet_model_1 import EfficientDetModel
+from src.dataset_adaptor import CarsDatasetAdaptor
+from src.effdet_datamodule import EfficientDetDataModule
+from src.effdet_model_1 import EfficientDetModel
 
 from pathlib import Path
 import pandas as pd
-from sklearn.model_selection import train_test_split
 
 import random
 

@@ -1,4 +1,8 @@
+data
 MNIST
 *.ts
 lightning_logs
 *.ckpt
+logs_tb
+*.log
+

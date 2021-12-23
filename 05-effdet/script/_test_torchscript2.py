@@ -1,8 +1,8 @@
 # error 발생
 import torch
-from effdet import DetBenchTrain, EfficientDet
+from effdet import EfficientDet
 
-from effdet_create_model import create_model
+from src.effdet_create_model import create_model
 
 """
 from effdet_model_1 import EfficientDetModel

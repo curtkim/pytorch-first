@@ -2,6 +2,7 @@
 # model.parameters()들을 평균낸다.
 
 import os
+import logging
 import typing
 
 import torch
@@ -53,7 +54,6 @@ class DataPartitioner(object):
         for partition in self.partitions:
             print('min', min(partition), 'max', max(partition))
 
-
     def use(self, partition):
         return Partition(self.data, self.partitions[partition])
 
@@ -79,8 +79,10 @@ class Net(nn.Module):
         return F.log_softmax(x)
 
 
-def partition_dataset():
-    """ Partitioning MNIST """
+def partition_dataset(rank: int, world_size: int):
+    """ Partitioning MNIST
+    """
+
     dataset = datasets.MNIST(
         './data',
         train=True,
@@ -89,36 +91,43 @@ def partition_dataset():
             transforms.ToTensor(),
             transforms.Normalize((0.1307,), (0.3081,))
         ]))
-    size = dist.get_world_size()
-    bsz = int(128 / size)
-    partition_sizes = [1.0 / size for _ in range(size)]
 
-    partition = DataPartitioner(dataset, partition_sizes)
-    partition = partition.use(dist.get_rank())
-    train_set = torch.utils.data.DataLoader(
-        partition, batch_size=bsz, shuffle=True)
-    return train_set, bsz
+    batch_size = int(128 / world_size)
+    partition_sizes = [1.0 / world_size for _ in range(world_size)]
+
+    partition = DataPartitioner(dataset, partition_sizes).use(rank)
+    train_set = torch.utils.data.DataLoader(partition, batch_size=batch_size, shuffle=True)
+    return train_set, batch_size
 
 
 def average_gradients(model):
     """ Gradient averaging. """
     size = float(dist.get_world_size())
     for param in model.parameters():
-        ### dist.all_reduct ###
+        ### 중요
         dist.all_reduce(param.grad.data, op=dist.ReduceOp.SUM)
         param.grad.data /= size
 
 
 def run(): #rank: int, size: int
     """ Distributed Synchronous SGD Example """
+
+    # process별로 log파일을 가진다.
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(module)s %(funcName)s [%(levelname)s] %(message)s",
+        handlers=[
+            logging.FileHandler(f"debug{dist.get_rank()}.log", "w")
+        ]
+    )
+
     torch.manual_seed(1234)
-    train_set, bsz = partition_dataset()
+    train_set, batch_size = partition_dataset(dist.get_rank(), dist.get_world_size())
     model = Net()
-    model = model
     #    model = model.cuda(rank)
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
 
-    num_batches = ceil(len(train_set.dataset) / float(bsz))
+    num_batches = ceil(len(train_set.dataset) / float(batch_size))
     for epoch in range(10):
         epoch_loss = 0.0
         for data, target in train_set:
@@ -129,10 +138,11 @@ def run(): #rank: int, size: int
             loss = F.nll_loss(output, target)
             epoch_loss += loss.data
             loss.backward()
+
+            ### 중요
             average_gradients(model)
             optimizer.step()
-        print('Rank ', dist.get_rank(),
-              ', epoch ', epoch, ': ', epoch_loss / num_batches)
+        logging.info(f"epoch {epoch} Rank {dist.get_rank()}({os.getpid()}) loss = {epoch_loss / num_batches}")
 
 
 def init_processes(rank, world_size, fn, backend='gloo'):
@@ -144,6 +154,7 @@ def init_processes(rank, world_size, fn, backend='gloo'):
 
 
 if __name__ == "__main__":
+
     world_size = 2
     processes = []
 

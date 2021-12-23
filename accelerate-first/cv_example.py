@@ -4,7 +4,6 @@ import re
 
 import numpy as np
 import torch
-from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.data import DataLoader, Dataset
 
 import PIL
@@ -31,6 +30,9 @@ from torchvision.transforms import Compose, RandomResizedCrop, Resize, ToTensor
 
 
 # Function to get the label from the filename
+from typing import Tuple
+
+
 def extract_label(fname):
     stem = fname.split(os.path.sep)[-1]
     return re.search(r"^(.*)_\d+\.jpg$", stem).groups()[0]
@@ -57,6 +59,38 @@ class PetsDataset(Dataset):
         return {"image": image, "label": label}
 
 
+def make_datasets(data_dir: str, image_size: int) -> Tuple:
+    # Grab all the image filenames
+    file_names = [os.path.join(data_dir, fname) for fname in os.listdir(data_dir) if fname.endswith(".jpg")]
+
+    # Build the label correspondences
+    all_labels = [extract_label(fname) for fname in file_names]
+    id_to_label = list(set(all_labels))
+    id_to_label.sort()
+    label_to_id = {lbl: i for i, lbl in enumerate(id_to_label)}
+
+    # Split our filenames between train and validation
+    random_perm = np.random.permutation(len(file_names))
+    cut = int(0.8 * len(file_names))
+    train_split = random_perm[:cut]
+    eval_split = random_perm[cut:]
+
+    # For training we use a simple RandomResizedCrop
+    train_tfm = Compose([
+        RandomResizedCrop(image_size, scale=(0.5, 1.0)),
+        ToTensor()
+    ])
+    train_dataset = PetsDataset([file_names[i] for i in train_split], image_transform=train_tfm, label_to_id=label_to_id)
+
+    # For evaluation, we use a deterministic Resize
+    eval_tfm = Compose([
+        Resize(image_size),
+        ToTensor()
+    ])
+    eval_dataset = PetsDataset([file_names[i] for i in eval_split], image_transform=eval_tfm, label_to_id=label_to_id)
+    return train_dataset, eval_dataset, label_to_id
+
+
 def training_function(config, args):
     # Initialize accelerator
     accelerator = Accelerator(fp16=args.fp16, cpu=args.cpu)
@@ -70,35 +104,12 @@ def training_function(config, args):
     if not isinstance(image_size, (list, tuple)):
         image_size = (image_size, image_size)
 
-    # Grab all the image filenames
-    file_names = [os.path.join(args.data_dir, fname) for fname in os.listdir(args.data_dir) if fname.endswith(".jpg")]
-
-    # Build the label correspondences
-    all_labels = [extract_label(fname) for fname in file_names]
-    id_to_label = list(set(all_labels))
-    id_to_label.sort()
-    label_to_id = {lbl: i for i, lbl in enumerate(id_to_label)}
-
     # Set the seed before splitting the data.
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
 
-    # Split our filenames between train and validation
-    random_perm = np.random.permutation(len(file_names))
-    cut = int(0.8 * len(file_names))
-    train_split = random_perm[:cut]
-    eval_split = random_perm[cut:]
-
-    # For training we use a simple RandomResizedCrop
-    train_tfm = Compose([RandomResizedCrop(image_size, scale=(0.5, 1.0)), ToTensor()])
-    train_dataset = PetsDataset(
-        [file_names[i] for i in train_split], image_transform=train_tfm, label_to_id=label_to_id
-    )
-
-    # For evaluation, we use a deterministic Resize
-    eval_tfm = Compose([Resize(image_size), ToTensor()])
-    eval_dataset = PetsDataset([file_names[i] for i in eval_split], image_transform=eval_tfm, label_to_id=label_to_id)
+    train_dataset, eval_dataset, label_to_id = make_datasets(args.data_dir, image_size)
 
     # Instantiate dataloaders.
     train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=batch_size, num_workers=4)
@@ -132,9 +143,14 @@ def training_function(config, args):
         model, optimizer, train_dataloader, eval_dataloader
     )
 
-    # Instantiate learning rate scheduler after preparing the training dataloader as the prepare method
-    # may change its length.
-    lr_scheduler = OneCycleLR(optimizer=optimizer, max_lr=lr, epochs=num_epochs, steps_per_epoch=len(train_dataloader))
+    # Instantiate learning rate scheduler after preparing the training dataloader
+    # as the prepare method may change its length.
+    lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(
+        optimizer=optimizer,
+        max_lr=lr,
+        epochs=num_epochs,
+        steps_per_epoch=len(train_dataloader)
+    )
 
     # Now we train the model
     for epoch in range(num_epochs):
@@ -175,7 +191,13 @@ def main():
     parser.add_argument("--fp16", action="store_true", help="If passed, will use FP16 training.")
     parser.add_argument("--cpu", action="store_true", help="If passed, will train on the CPU.")
     args = parser.parse_args()
-    config = {"lr": 3e-2, "num_epochs": 3, "seed": 42, "batch_size": 64, "image_size": 224}
+    config = {
+        "lr": 3e-2,
+        "num_epochs": 3,
+        "seed": 42,
+        "batch_size": 64,
+        "image_size": 224
+    }
     training_function(config, args)
 
 

@@ -1,9 +1,8 @@
 import torch
 from pytorch_lightning import LightningModule
-from pytorch_lightning.core.decorators import auto_move_data
 
-from effdet_transformations import get_valid_transforms
-from effdet_create_model import create_model
+from src.effdet_transformations import get_valid_transforms
+from src.effdet_create_model import create_model
 
 from fastcore.dispatch import typedispatch
 from typing import List, Tuple
@@ -60,7 +59,6 @@ class EfficientDetModel(LightningModule):
         self.wbf_iou_threshold = wbf_iou_threshold
         self.inference_tfms = inference_transforms
 
-    @auto_move_data
     def forward(self, images, targets):
         return self.model(images, targets)
 

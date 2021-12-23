@@ -1,16 +1,14 @@
 # error 발생
 import torch
-from effdet import DetBenchTrain, EfficientDet
 
-from effdet_create_model import create_model
-from effdet_model_1 import EfficientDetModel
+from src.effdet_model_1 import EfficientDetModel
 
 model = EfficientDetModel(
     num_classes=1,
     img_size=512
     )
 
-model.load_state_dict(torch.load('trained_effdet'))
+model.load_state_dict(torch.load('../trained_effdet'))
 model.eval()
 print(type(model))
 print(type(model.model))
@@ -18,5 +16,5 @@ print(type(model.model.model))
 target_model = model.model.model
 
 scripted = torch.jit.script(target_model)
-scripted.save('scripted.torchscript')
+scripted.save('../scripted.torchscript')
 

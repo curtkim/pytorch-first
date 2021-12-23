@@ -44,7 +44,9 @@ def run_reduce(rank, size):
 
     # Rank  0  has data Rank   1  has data  tensor(2.)
     # tensor(2.)
+    #
     # maybe
+    #
     # Rank 0 has data tensor(2.)
     # Rank 1 ahs data tensor(2.)
 
