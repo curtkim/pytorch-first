@@ -3,7 +3,7 @@ from random import random, randint
 from mlflow import log_metric, log_param, log_artifacts
 
 import mlflow
-mlflow.set_tracking_uri("http://localhost:5500")
+mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.set_experiment("my-experiment")
 
 
