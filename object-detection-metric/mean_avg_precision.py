@@ -107,4 +107,10 @@ def mean_average_precision(
         # torch.trapz for numerical integration
         average_precisions.append(torch.trapz(precisions, recalls))
 
+    if len(average_precisions) == 0:
+        if len(true_boxes) == 0 and len(pred_boxes) == 0:
+            return 1.0
+        else:
+            return 0.0
+
     return sum(average_precisions) / len(average_precisions)

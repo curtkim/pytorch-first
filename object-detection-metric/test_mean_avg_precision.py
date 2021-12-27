@@ -107,3 +107,52 @@ def test_one_inaccurate_box():
     # trapz(Trapezoidal rule)
     assert abs(torch.trapz(y, x) - mean_avg_prec) < EPSILON
 
+
+def test_empty():
+    t1_preds = []
+    t1_targets = []
+    t1_correct_mAP = 1
+
+    mean_avg_prec = mean_average_precision(
+        t1_preds,
+        t1_targets,
+        iou_threshold=0.5,
+        box_format="midpoint",
+        num_classes=1,
+    )
+    assert abs(t1_correct_mAP - mean_avg_prec) < EPSILON
+
+
+def test_prediction_but_empty():
+    t1_preds = [
+        # train_idx, class_prediction, prob_score, x, y, width, height
+        [0, 0, 0.9, 0.55, 0.2, 0.3, 0.2],
+    ]
+    t1_targets = []
+    t1_correct_mAP = 0
+
+    mean_avg_prec = mean_average_precision(
+        t1_preds,
+        t1_targets,
+        iou_threshold=0.5,
+        box_format="midpoint",
+        num_classes=1,
+    )
+    assert abs(t1_correct_mAP - mean_avg_prec) < EPSILON
+
+
+def test_predict_empty_but_exist():
+    t1_preds = []
+    t1_targets = [
+        [0, 0, 0.9, 0.55, 0.2, 0.3, 0.2],
+    ]
+    t1_correct_mAP = 0
+
+    mean_avg_prec = mean_average_precision(
+        t1_preds,
+        t1_targets,
+        iou_threshold=0.5,
+        box_format="midpoint",
+        num_classes=1,
+    )
+    assert abs(t1_correct_mAP - mean_avg_prec) < EPSILON
