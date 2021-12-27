@@ -102,8 +102,8 @@ def test_one_inaccurate_box():
     )
     assert abs(t4_correct_mAP - mean_avg_prec) < EPSILON
 
-    y = torch.tensor([0.0000, 0.5000, 0.6667])
-    x = torch.tensor([0.0000, 0.3333, 0.6667])
+    y = torch.tensor([1.0000, 0.0000, 0.5000, 0.6667])
+    x = torch.tensor([0.0000, 0.0000, 0.3333, 0.6667])
     # trapz(Trapezoidal rule)
     assert abs(torch.trapz(y, x) - mean_avg_prec) < EPSILON
 
