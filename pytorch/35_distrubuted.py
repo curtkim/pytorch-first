@@ -101,7 +101,9 @@ def partition_dataset(rank: int, world_size: int):
 
 
 def average_gradients(model):
-    """ Gradient averaging. """
+    """ Gradient averaging.
+    여러 process 사이에 model을 평균낸다.
+    """
     size = float(dist.get_world_size())
     for param in model.parameters():
         ### 중요
@@ -111,15 +113,6 @@ def average_gradients(model):
 
 def run(): #rank: int, size: int
     """ Distributed Synchronous SGD Example """
-
-    # process별로 log파일을 가진다.
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(module)s %(funcName)s [%(levelname)s] %(message)s",
-        handlers=[
-            logging.FileHandler(f"debug{dist.get_rank()}.log", "w")
-        ]
-    )
 
     torch.manual_seed(1234)
     train_set, batch_size = partition_dataset(dist.get_rank(), dist.get_world_size())
@@ -147,6 +140,16 @@ def run(): #rank: int, size: int
 
 def init_processes(rank, world_size, fn, backend='gloo'):
     """ Initialize the distributed environment. """
+
+    # process별로 log파일을 가진다.
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(module)s %(funcName)s [%(levelname)s] %(message)s",
+        handlers=[
+            logging.FileHandler(f"debug{rank}.log", "w")
+        ]
+    )
+
     os.environ['MASTER_ADDR'] = '127.0.0.1'
     os.environ['MASTER_PORT'] = '29500'
     dist.init_process_group(backend, rank=rank, world_size=world_size)
