@@ -34,13 +34,13 @@ def run_immediates(rank, size):
     print('Rank ', rank, ' has data ', tensor[0])
 
 
-def run_reduce(rank, size):
+def run_reduce(rank, world_size):
     """ All-Reduce example."""
     """ Simple collective communication. """
     group = dist.new_group([0, 1])
     tensor = torch.ones(1)
     dist.all_reduce(tensor, op=dist.ReduceOp.SUM, group=group)
-    print('Rank ', rank, ' has data ', tensor[0])
+    print(f"rank {rank}, world_size {world_size}, has data ", tensor[0])
 
     # Rank  0  has data Rank   1  has data  tensor(2.)
     # tensor(2.)
