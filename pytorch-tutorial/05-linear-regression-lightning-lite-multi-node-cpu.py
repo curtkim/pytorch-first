@@ -6,6 +6,7 @@ import torch
 from pytorch_lightning.lite import LightningLite
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset
+import torch.distributed as dist
 
 
 class MyDataset(Dataset):
@@ -47,7 +48,7 @@ class Lite(LightningLite):
             level=logging.INFO,
             format="%(asctime)s [%(levelname)s] %(message)s",
             handlers=[
-                logging.FileHandler(f"debug_gpu_{self.global_rank}.log", 'w')
+                logging.FileHandler(f"debug_multi_node_{self.global_rank}.log", 'w')
             ]
         )
 
@@ -65,7 +66,7 @@ class Lite(LightningLite):
 
         for epoch in range(epochs):
             for inputs, labels in dataloader:
-                logging.info(f"{os.getpid()} {epoch}, {inputs.transpose(0, 1)} {labels.transpose(0,1)}")
+                logging.info(f"{epoch}, {inputs.transpose(0, 1)} {labels.transpose(0,1)}")
 
                 optimizer.zero_grad()
                 outputs = model(inputs)
@@ -89,7 +90,6 @@ def predict_and_visualize(model, dataset):
 
 
 if __name__ == '__main__':
-    print(os.getpid())
     inputDim = 1        # takes variable 'x'
     outputDim = 1       # takes variable 'y'
     epochs = 20
@@ -99,10 +99,9 @@ if __name__ == '__main__':
     dataset = MyDataset(100)
     model = linearRegression(inputDim, outputDim)
 
-    #ddp 2개의 process가 뜨고. data가 섞여서 출력된다. replace_sampler=False를 주지 않는 이상.
-    #dp는 1개의 process가 뜬다. data가 순서대로 출력된다.
-    module = Lite(strategy="dp", devices=2, accelerator="gpu")
+    module = Lite(strategy="ddp_spawn", num_nodes=2, accelerator="cpu")
     module.run(model=model, dataset=dataset, epochs=epochs, batch_size=batch_size, learningRate=learningRate)
 
-    model_cpu = model.cpu()
-    predict_and_visualize(model_cpu, dataset)
+    if dist.get_rank() == 0:
+        model_cpu = model.cpu()
+        predict_and_visualize(model_cpu, dataset)
