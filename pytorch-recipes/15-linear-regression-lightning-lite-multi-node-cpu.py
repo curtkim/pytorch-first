@@ -100,7 +100,7 @@ if __name__ == '__main__':
     batch_size = 10
     learningRate = 0.00005
 
-    dataset = MyDataset(100)
+    dataset = MyDataset(95)     # 48 + 48 개로 실행된다. 1개는 중복되게 된다.
     model = linearRegression(inputDim, outputDim)
 
     module = Lite(strategy="ddp_spawn", num_nodes=2, accelerator="cpu")
