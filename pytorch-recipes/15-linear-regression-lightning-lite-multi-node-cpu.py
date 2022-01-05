@@ -76,20 +76,24 @@ class Lite(LightningLite):
 
             print('epoch {}, loss {}'.format(epoch, loss.item()))
 
+        if dist.get_rank() == 0:
+            model_cpu = model.cpu()
+            self.predict_and_visualize(model_cpu, dataset)
 
-def predict_and_visualize(model, dataset):
-    with torch.no_grad():  # we don't need gradients in the testing phase
-        predicted = model(torch.from_numpy(dataset.x_train)).data.numpy()
-        #print(predicted)
+    def predict_and_visualize(self, model, dataset):
+        with torch.no_grad():  # we don't need gradients in the testing phase
+            predicted = model(torch.from_numpy(dataset.x_train)).data.numpy()
+            #print(predicted)
 
-    plt.clf()
-    #plt.plot(dataset.x_train, dataset.y_train, 'go', label='True data', alpha=0.5)
-    plt.plot(dataset.x_train, predicted, '--', label='Predictions', alpha=0.5)
-    plt.legend(loc='best')
-    plt.show()
+        plt.clf()
+        #plt.plot(dataset.x_train, dataset.y_train, 'go', label='True data', alpha=0.5)
+        plt.plot(dataset.x_train, predicted, '--', label='Predictions', alpha=0.5)
+        plt.legend(loc='best')
+        plt.show()
 
 
 if __name__ == '__main__':
+
     inputDim = 1        # takes variable 'x'
     outputDim = 1       # takes variable 'y'
     epochs = 20
@@ -101,7 +105,3 @@ if __name__ == '__main__':
 
     module = Lite(strategy="ddp_spawn", num_nodes=2, accelerator="cpu")
     module.run(model=model, dataset=dataset, epochs=epochs, batch_size=batch_size, learningRate=learningRate)
-
-    if dist.get_rank() == 0:
-        model_cpu = model.cpu()
-        predict_and_visualize(model_cpu, dataset)

@@ -47,7 +47,7 @@ class Lite(LightningLite):
             level=logging.INFO,
             format="%(asctime)s [%(levelname)s] %(message)s",
             handlers=[
-                logging.FileHandler(f"debug_gpu_{self.global_rank}.log", 'w')
+                logging.FileHandler(f"debug_dp_{self.global_rank}.log", 'w')
             ]
         )
 
