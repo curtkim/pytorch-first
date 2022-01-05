@@ -1,4 +1,5 @@
 # from https://hulk89.github.io/pytorch/2019/09/30/pytorch_dataset/
+import os
 
 import torch
 import numpy as np
@@ -10,7 +11,7 @@ class MapDataset(Dataset):
         return 10
 
     def __getitem__(self, idx):
-        print(idx)
+        print('__getitem__', os.getpid(), idx)
         return {
             "input": torch.tensor([idx, 2 * idx, 3 * idx], dtype=torch.float32),
             "label": torch.tensor(idx, dtype=torch.float32)
@@ -42,4 +43,13 @@ point_sampler = RandomSampler(map_dataset)
 batch_sampler = BatchSampler(point_sampler, 3, False)
 dataloader = torch.utils.data.DataLoader(map_dataset, batch_sampler=batch_sampler)
 for data in dataloader:
+    print(data['label'], data['input'].shape)
+
+
+print("--- num_workers=2", os.getpid())
+for data in torch.utils.data.DataLoader(map_dataset, num_workers=2):
+    print(data['label'], data['input'].shape)
+
+print("--- num_workers=2 batch_size=2", os.getpid())
+for data in torch.utils.data.DataLoader(map_dataset, num_workers=2, batch_size=2):
     print(data['label'], data['input'].shape)
