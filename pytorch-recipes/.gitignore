@@ -1,1 +1,3 @@
 *.pt
+lightning_logs
+*.log
