@@ -55,6 +55,10 @@ if __name__ == "__main__":
         "valid": DataLoader(valid_data, batch_size=32, num_workers=4),
     }
 
+    # a, b, = train_data[0]
+    # print(a.shape)  # [3, 32, 32]
+    # print(b)        # 6
+
     # model, criterion, optimizer, scheduler
     model = resnet9(in_channels=3, num_classes=10)
     criterion = nn.CrossEntropyLoss()
