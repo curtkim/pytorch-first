@@ -1,5 +1,11 @@
 ## howto
-    
+
+    CUDA_VISIBLE_DEVICES="0" python 03_cifar_ddp.py
+
+    # 아래방법 실패함.
+    MASTER_ADDR=localhost MASTER_PORT=23373 WORLD_SIZE=2 NODE_RANK=0 python 05_cifar_custom_all.py
+    MASTER_ADDR=localhost MASTER_PORT=23373 WORLD_SIZE=2 NODE_RANK=1 python 05_cifar_custom_all.py
+
 
 ## ICallback
 
