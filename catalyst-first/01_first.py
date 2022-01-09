@@ -39,7 +39,8 @@ LOSS_KEY = "loss"
 
 
 runner = dl.SupervisedRunner(
-    input_key=INPUT_KEY, output_key=OUTPUT_KEY, target_key=TARGET_KEY, loss_key=LOSS_KEY
+    input_key=INPUT_KEY, output_key=OUTPUT_KEY, target_key=TARGET_KEY,
+    loss_key=LOSS_KEY
 )
 
 runner.train(
@@ -74,7 +75,7 @@ assert "accuracy01" in metrics.keys()
 
 
 for prediction in runner.predict_loader(loader=loaders["valid"]):
-    assert prediction["logits"].detach().cpu().numpy().shape[-1] == 10
+    assert prediction[OUTPUT_KEY].detach().cpu().numpy().shape[-1] == 10
 
 
 features_batch = next(iter(loaders['valid']))[0]
