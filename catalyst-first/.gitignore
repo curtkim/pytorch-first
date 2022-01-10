@@ -3,3 +3,4 @@ logs
 *.tar.gz
 logdir2
 cifar-10-batches-py
+log_*

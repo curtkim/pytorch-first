@@ -36,7 +36,7 @@ def resnet9(in_channels: int, num_classes: int, size: int = 16):
 
 if __name__ == "__main__":
     # experiment setup
-    logdir = "./logdir2"
+    logdir = "./log_03_cifar_ddp"
     num_epochs = 10
 
     # data
@@ -51,8 +51,8 @@ if __name__ == "__main__":
         os.getcwd(), train=False, download=True, transform=transform
     )
     loaders = {
-        "train": DataLoader(train_data, batch_size=32, num_workers=4),
-        "valid": DataLoader(valid_data, batch_size=32, num_workers=4),
+        "train": DataLoader(train_data, batch_size=32*32, num_workers=4),
+        "valid": DataLoader(valid_data, batch_size=32*32, num_workers=4),
     }
 
     # a, b, = train_data[0]

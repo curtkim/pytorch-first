@@ -62,18 +62,18 @@ class CustomSupervisedRunner(dl.SupervisedRunner):
             train_sampler = valid_sampler = None
 
         train_loader = DataLoader(
-            train_data, batch_size=32, sampler=train_sampler, num_workers=4
+            train_data, batch_size=32*32, sampler=train_sampler, num_workers=4
         )
         valid_loader = DataLoader(
-            valid_data, batch_size=32, sampler=train_sampler, num_workers=4
+            valid_data, batch_size=32*32, sampler=valid_sampler, num_workers=4
         )
         return {"train": train_loader, "valid": valid_loader}
 
 
 if __name__ == "__main__":
     # experiment setup
-    logdir = "./logdir2"
-    num_epochs = 10
+    logdir = "./log_04_cifar_custom_loader"
+    num_epochs = 2
 
     # model, criterion, optimizer, scheduler
     model = resnet9(in_channels=3, num_classes=10)
