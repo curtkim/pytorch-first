@@ -6,6 +6,10 @@
     MASTER_ADDR=localhost MASTER_PORT=23373 WORLD_SIZE=2 NODE_RANK=0 python 05_cifar_custom_all.py
     MASTER_ADDR=localhost MASTER_PORT=23373 WORLD_SIZE=2 NODE_RANK=1 python 05_cifar_custom_all.py
 
+    # multi node, each node has 2 gpus
+    # python 05_cifar_custom_all.py --master_addr=a.b.c --master_port=31088 --world_size=4 --workers_dist_rank=0 --num_node_workers=2
+    # python 05_cifar_custom_all.py --master_addr=a.b.c --master_port=31088 --world_size=4 --workers_dist_rank=2 --num_node_workers=2
+
 
 ## ICallback
 
