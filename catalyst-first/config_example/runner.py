@@ -45,4 +45,14 @@ class CustomSupervisedConfigRunner(IRunnerMixin, SupervisedConfigRunner):
     pass
 
 
-__all__ = ["CustomSupervisedConfigRunner"]
+if SETTINGS.hydra_required:
+    import hydra
+
+    from catalyst.dl import SupervisedHydraRunner
+
+    class CustomSupervisedHydraRunner(IRunnerMixin, SupervisedHydraRunner):
+        pass
+
+    __all__ = ["CustomSupervisedConfigRunner", "CustomSupervisedHydraRunner"]
+else:
+    __all__ = ["CustomSupervisedConfigRunner"]
