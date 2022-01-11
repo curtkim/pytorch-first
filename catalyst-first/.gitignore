@@ -3,3 +3,6 @@ logs
 *.tar.gz
 logdir2
 cifar-10-batches-py
+log_*
+config_example_logs
+config_example_hydra_logs

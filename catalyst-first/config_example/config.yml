@@ -1,7 +1,7 @@
 # For detailed comments on this configuration file refer to configs/config-description-eng.yml
 
 shared:
-  dataset_root: &dataset_root "./data"
+  dataset_root: &dataset_root "."
   seed: &seed 42
   valid_loader: &valid_loader valid
   valid_metric: &valid_metric accuracy01
@@ -10,7 +10,7 @@ shared:
 
 args:
   expdir: "config_example"
-  logdir: &logdir "./logs"
+  logdir: &logdir "./config_example_logs"
   seed: *seed
   distributed: False
   apex: False

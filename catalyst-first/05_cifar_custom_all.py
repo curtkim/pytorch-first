@@ -7,6 +7,8 @@ from torch.utils.data.distributed import DistributedSampler
 from catalyst import dl, utils
 from catalyst.contrib import CIFAR10, Compose, ImageToTensor, NormalizeImage, ResidualBlock
 
+import argparse
+
 
 def conv_block(in_channels, out_channels, pool=False):
     layers = [
@@ -34,12 +36,28 @@ def resnet9(in_channels: int, num_classes: int, size: int = 16):
     )
 
 class CustomRunner(dl.IRunner):
-    def __init__(self, logdir: str):
+    def __init__(self, logdir: str, master_addr: str, master_port: int, world_size: int, workers_dist_rank: int, num_node_workers: int):
         super().__init__()
         self._logdir = logdir
+        self.master_addr = master_addr
+        self.master_port = master_port
+        self.world_size = world_size
+        self.workers_dist_rank = workers_dist_rank
+        self.num_node_workers = num_node_workers
 
     def get_engine(self):
-        return dl.DistributedDataParallelAMPEngine()
+        #return dl.DistributedDataParallelAMPEngine()
+        return dl.DistributedDataParallelEngine(
+                    address=self.master_addr,
+                    port=self.master_port,
+                    ddp_kwargs={"find_unused_parameters": False},
+                    process_group_kwargs={"backend": "nccl"},
+
+                    world_size=self.world_size,
+                    workers_dist_rank=self.workers_dist_rank,
+                    num_node_workers=self.num_node_workers,
+                )
+        #return dl.DataParallelEngine()
 
     def get_loggers(self):
         return {
@@ -53,7 +71,7 @@ class CustomRunner(dl.IRunner):
         return ["train"]
 
     def get_stage_len(self, stage: str) -> int:
-        return 10
+        return 2
 
     def get_loaders(self, stage: str):
         transform = Compose([
@@ -83,10 +101,10 @@ class CustomRunner(dl.IRunner):
             train_sampler = valid_sampler = None
 
         train_loader = DataLoader(
-            train_data, batch_size=32, sampler=train_sampler, num_workers=4
+            train_data, batch_size=32*32, sampler=train_sampler, num_workers=4
         )
         valid_loader = DataLoader(
-            valid_data, batch_size=32, sampler=train_sampler, num_workers=4
+            valid_data, batch_size=32*32, sampler=valid_sampler, num_workers=4
         )
         return {"train": train_loader, "valid": valid_loader}
 
@@ -120,7 +138,7 @@ class CustomRunner(dl.IRunner):
             "checkpoint": dl.CheckpointCallback(
                 self._logdir,
                 loader_key="valid",
-                metric_key="accuracy",
+                metric_key="loss",
                 minimize=False,
                 save_n_best=1,
             ),
@@ -138,8 +156,29 @@ class CustomRunner(dl.IRunner):
 
 
 if __name__ == "__main__":
-    # experiment setup
-    logdir = "./logdir3"
+    # multi node test를 node 하나에서 실행해보기 (동작하지 않음, node에서는 spawn할때 rank가 0부터 시작하는 것이 강제된다)
+    # python 05_cifar_custom_all.py --world_size=2 --workers_dist_rank=0 --num_node_workers=1
+    # python 05_cifar_custom_all.py --world_size=2 --workers_dist_rank=1 --num_node_workers=1
 
-    runner = CustomRunner(logdir)
+    # multi node, each node has 2 gpus
+    # python 05_cifar_custom_all.py --master_addr=a.b.c --master_port=31088 --world_size=4 --workers_dist_rank=0 --num_node_workers=2
+    # python 05_cifar_custom_all.py --master_addr=a.b.c --master_port=31088 --world_size=4 --workers_dist_rank=2 --num_node_workers=2
+
+    # single node 2 gpu
+    # python 05_cifar_custom_all.py --master_addr=0.0.0.0 --master_port=20000 --world_size=2 --workers_dist_rank=0 --num_node_workers=2
+
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('--master_addr', type=str)
+    parser.add_argument('--master_port', type=int)
+    parser.add_argument('--world_size', type=int)
+    parser.add_argument('--workers_dist_rank', type=int)
+    parser.add_argument('--num_node_workers', type=int)
+    args = parser.parse_args()
+
+    # experiment setup
+    logdir = "./log_05_cifar_custom_all"
+
+    runner = CustomRunner(logdir, args.master_addr, args.master_port, args.world_size, args.workers_dist_rank, args.num_node_workers)
     runner.run()
+
+
