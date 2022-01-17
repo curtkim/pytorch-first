@@ -30,7 +30,46 @@
 
     ```
     from objdetecteval.metrics.coco_metrics import get_coco_stats
-    coco_results = get_coco_stats(..)
+    
+    # {prediction, target}_{image_ids, class_labels, bboxes, class_confidences}
+    batch = {
+        "prediction_image_ids": [0, 1],
+        "predicted_class_labels": [
+            [0, 0],
+            [1, 0],
+        ],
+        "predicted_bboxes": [
+            # image 0
+            [
+	        [750.65, 276.56, 963.77, 369.68], 
+		[60, 60, 50, 50]
+	    ],
+            # image 1
+            [
+	        [1750.65, 276.56, 1963.77, 369.68], 
+		[60, 60, 50, 50]
+	    ],
+        ],	
+        "predicted_class_confidences": [[0.6, 0.3], [0.6, 0.3]],
+
+        "target_image_ids": [0, 1],
+        "target_class_labels": [
+            [0],
+            [1],
+        ],
+        "target_bboxes": [
+            # image 0
+            [
+                [750.65, 276.56, 963.77, 369.68],
+            ],
+            # image 1
+            [
+                [750.65, 276.56, 963.77, 369.68],
+            ],
+        ],
+    }
+
+    coco_results = get_coco_stats(**batch)
     coco_results['ALL']
     coco_results[0] # class 0
     coco_results[1] # class 1
@@ -46,6 +85,7 @@
 ## mean_average_precision module 
 - [metricbuilder_mAP.ipynb](metricbuilder_mAP.ipynb)
 - https://github.com/bes-dev/mean_average_precision
+- image_id를 어떻게 처리하는지 모르겠다.
 - add로 추가하고, value를 호출해서 metric을 구하는 방식(add를 여러번 할 수 있다면 incremental적)
 - pascal coco mAP를 구할 수 있다.
 
