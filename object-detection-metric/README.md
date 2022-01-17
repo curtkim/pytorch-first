@@ -3,7 +3,7 @@
 - https://www.youtube.com/watch?v=FppOzcDvaDI&list=PLhhyoLH6IjfxeoooqP9rhU3HJIAVAJ3Vz&index=46
 - api적이다
 
-
+    ```
     preds = [
       # train_idx, class_prediction, prob_score, x, y, width, height 
       [0, 0, 0.9, 0.55, 0.2, 0.3, 0.2],
@@ -19,6 +19,7 @@
       box_format="midpoint", 
       num_classes=1
     )
+    ```
 
     
 ## objdetecteval module 
@@ -27,6 +28,7 @@
 - 결과가 문서적이다
 
 
+    ```
     from objdetecteval.metrics.coco_metrics import get_coco_stats
     coco_results = get_coco_stats(..)
     coco_results['ALL']
@@ -38,6 +40,7 @@
       'AP_all_IOU_0_50': 0.5,
       ...
     }
+    ```
 
 
 ## mean_average_precision module 
@@ -46,7 +49,7 @@
 - add로 추가하고, value를 호출해서 metric을 구하는 방식(add를 여러번 할 수 있다면 incremental적)
 - pascal coco mAP를 구할 수 있다.
 
-
+    ```
     from mean_average_precision import MetricBuilder
     # [xmin, ymin, xmax, ymax, class_id, difficult, crowd]
     gt = np.array([
@@ -65,7 +68,7 @@
 
     # compute PASCAL VOC metric at the all points
     print(f"VOC PASCAL mAP in all points: {metric_fn.value(iou_thresholds=0.5)['mAP']}")
-
+    ```
 
 ## map
 - https://github.com/aladdinpersson/Machine-Learning-Collection/blob/master/ML_tests/Object_detection_tests/map_test.py
