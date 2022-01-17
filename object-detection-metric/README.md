@@ -1,3 +1,10 @@
+## summary from https://www.youtube.com/watch?v=FppOzcDvaDI&list=PLhhyoLH6IjfxeoooqP9rhU3HJIAVAJ3Vz&index=46
+![](1_samples.png)
+![](2_true_positive_false_positive.png)
+![](3_sort_by_confience.png)
+![](5_precision_recall.png)
+![](6_map.png)
+
 ## mean_avg_precision
 - [test_mean_avg_precision.py](test_mean_avg_precision.py)
 - https://www.youtube.com/watch?v=FppOzcDvaDI&list=PLhhyoLH6IjfxeoooqP9rhU3HJIAVAJ3Vz&index=46
