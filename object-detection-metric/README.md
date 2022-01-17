@@ -3,6 +3,7 @@
 - https://www.youtube.com/watch?v=FppOzcDvaDI&list=PLhhyoLH6IjfxeoooqP9rhU3HJIAVAJ3Vz&index=46
 - api적이다
 
+
     preds = [
       # train_idx, class_prediction, prob_score, x, y, width, height 
       [0, 0, 0.9, 0.55, 0.2, 0.3, 0.2],
@@ -44,6 +45,7 @@
 - https://github.com/bes-dev/mean_average_precision
 - add로 추가하고, value를 호출해서 metric을 구하는 방식(add를 여러번 할 수 있다면 incremental적)
 - pascal coco mAP를 구할 수 있다.
+
 
     from mean_average_precision import MetricBuilder
     # [xmin, ymin, xmax, ymax, class_id, difficult, crowd]
