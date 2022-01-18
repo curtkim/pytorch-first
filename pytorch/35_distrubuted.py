@@ -10,7 +10,6 @@ import torch.distributed as dist
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import torch.multiprocessing as mp
 
 from math import ceil
 from random import Random
@@ -162,7 +161,7 @@ if __name__ == "__main__":
     processes = []
 
     for rank in range(world_size):
-        p = mp.Process(target=init_processes, args=(rank, world_size, run))
+        p = torch.multiprocessing.Process(target=init_processes, args=(rank, world_size, run))
         p.start()
         processes.append(p)
 

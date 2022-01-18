@@ -36,15 +36,24 @@
 - scheduler
 - 
 - stage_key
-- global_epoch_step
-- global_batch_step
-- global_sample_step
 - is_infer_stage
 - is_train_loader
-- 
+
 - batch_metrics
 - loader_metrics
 - epoch_metrics
+
+- loader_batch_len
+- loader_batch_size
+- loader_batch_step
+
+- stage_batch_step
+- stage_epoch_len
+- stage_epoch_step
+ 
+- global_epoch_step
+- global_batch_step
+- global_sample_step
 
 - engine.is_ddp
 - engine.is_master_process
