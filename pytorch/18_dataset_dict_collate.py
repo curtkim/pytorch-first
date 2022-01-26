@@ -10,7 +10,6 @@ class MyDataset(Dataset):
     def __getitem__(self, index):
         x = self.data[index]
         y = self.target[index]
-
         return {'data': x, 'target': y}
 
     def __len__(self):
