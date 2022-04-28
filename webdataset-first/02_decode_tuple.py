@@ -7,7 +7,7 @@ from itertools import islice
 
 dataset = (
     wds.WebDataset('openimages-train-000000.tar')
-    .shuffle(100)
+    #.shuffle(100)
     .decode('pil')
     .to_tuple("jpg;png", "json")
 )

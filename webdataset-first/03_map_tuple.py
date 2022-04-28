@@ -22,7 +22,7 @@ preproc = transforms.Compose([
 
 dataset = (
     wds.WebDataset(url)
-    .shuffle(100)
+    #.shuffle(100)
     .decode("pil")
     .to_tuple("jpg;png", "json")
     .map_tuple(preproc, identity)

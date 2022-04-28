@@ -1,3 +1,4 @@
+# splitter 변경된것 같다. 현재 동작하지 않음.
 import webdataset as wds
 import braceexpand
 import torch
